@@ -4,15 +4,15 @@
     <title>Chat Room</title>
 </head>
 <body>
-    <h1>Grupo/Sala: {{ room_name }}</h1>
-    <a href="{% url 'login' %}">cerrar</a>
+    <h1>Room: {{ room_name }}</h1>
     <div id="chat-log"></div>
     <input id="chat-message-input" type="text" size="100">
     <input id="chat-message-submit" type="button" value="Send">
 
     <script>
         const roomName = "{{ room_name }}";
-        const receiver = "{{ receiver }}";  // Destinatario obtenido desde la vista
+        const receiver = "{{ receiver }}";
+        const isPrivateChat = {{ is_private_chat|yesno:"true,false" }};
         const chatSocket = new WebSocket(
             'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
         );
@@ -38,8 +38,8 @@
             const message = messageInputDom.value;
             chatSocket.send(JSON.stringify({
                 'message': message,
-                'sender': "{{ request.user.username }}",  // Remitente (usuario autenticado)
-                'receiver': receiver,  // Destinatario (obtenido desde la vista)
+                'sender': "{{ request.user.username }}",
+                'receiver': receiver,
             }));
             messageInputDom.value = '';
         };

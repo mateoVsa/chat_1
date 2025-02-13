@@ -2,33 +2,67 @@
 
 # Create your views here.
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from .models import ChatRoom
+from .forms import ChatRoomForm
 
+
+def is_admin(user):
+    return user.is_staff or user.is_superuser
+
+@login_required
+@user_passes_test(is_admin)
+def create_chat_room(request):
+    if request.method == 'POST':
+        form = ChatRoomForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('index')
+        form = ChatRoomForm()
+    return render(request, 'chat/create_chat_room.html', {'form': form})
 
 @login_required
 def room(request, room_name, receiver):
     try:
-        # Verificar que el destinatario exista
-        User.objects.get(username=receiver)
+        user = User.objects.get(username=room_name)
+        is_private_chat = True
     except User.DoesNotExist:
-        # Redirigir a la página principal si el destinatario no existe
-        return redirect('index')
+        is_private_chat = False
+    
+    if is_private_chat:
+        
+        if not (request.user.is_staff or request.user.is_superuser or request.user == user):
+            return redirect('index')
+    else:
+        try:
+            chat_room = ChatRoom.objects.get(name=room_name, allowed_users=request.user)
+        except  ChatRoom.DoesNotExist:
+            return redirect('index')  # Redirigir si no tiene acceso
 
     return render(request, 'chat/room.html', {
         'room_name': room_name,
         'receiver': receiver,
+        'is_private_chat': is_private_chat,  # Indicar si es un chat individual
+            
+    
     })
     
+
+
+
+
 @login_required
 def index(request):
-    if request.method == 'POST':
-        room_name = request.POST.get('room_name')
-        receiver = request.POST.get('receiver')
-        return redirect('room', room_name=room_name, receiver=receiver)
-    return render(request, 'chat/index.html')
+    chat_rooms = ChatRoom.objects.filter(allowed_users=request.user)
+    
+    if request.user.is_staff or request.user.is_superuser:
+                users = User.objects.all()
+    else:
+                users = User.objects.filter(is_staff=True)
+    return render(request, 'chat/index.html', {'chat_rooms': chat_rooms,'users':users})
 
 def signup(request):
     if request.method=='POST':
@@ -40,3 +74,5 @@ def signup(request):
     else:
         form = UserCreationForm()
     return render(request, 'registration/signup.html',{'form':form})
+
+

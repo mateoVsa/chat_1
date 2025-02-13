@@ -4,17 +4,32 @@
     <title>Chat App</title>
 </head>
 <body>
-    <h1>Bienvenido al Chat</h1>
+    <h1>Bienvenido al Chat: {{user.username}}</h1>
     <a href="{% url 'login' %}">cerrar</a>
-    <form method="post">
-        {% csrf_token %}
-        <label for="room_name">Nombre de la sala:</label>
-        <input type="text" id="room_name" name="room_name" required>
-        <br>
-        <label for="receiver">Destinatario:</label>
-        <input type="text" id="receiver" name="receiver" required>
-        <br>
-        <button type="submit">Entrar a la sala</button>
-    </form>
+    <!-- Sección de salas disponibles -->
+    <h2>Salas disponibles:</h2>
+    <ul>
+        {% for room in chat_rooms %}
+            <li>
+                <a href="{% url 'room' room.name request.user.username %}">
+                    {{ room.name }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <!-- Sección de lista de usuarios -->
+    <h2>Lista de Usuarios:</h2>
+    <ul>
+        {% for user in users %}
+            <li>
+                <a href="{% url 'room' user.username request.user.username %}">
+                    {{ user.username }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+
+  
 </body>
 </html>

@@ -12,3 +12,10 @@ class Message(models.Model):
 
     def __str__(self):
         return f'{self.sender} to {self.receiver}: {self.message}'
+
+class ChatRoom(models.Model):
+    name = models.CharField(max_length=100, unique=True)  # Nombre de la sala
+    allowed_users = models.ManyToManyField(User, related_name='allowed_chat_rooms')  # Usuarios permitidos
+
+    def __str__(self):
+        return self.name
