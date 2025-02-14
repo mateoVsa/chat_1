@@ -5,7 +5,12 @@
 </head>
 <body>
     <h1>Room: {{ room_name }}</h1>
-    <div id="chat-log"></div>
+    <div id="chat-log">
+        <!-- Mostrar mensajes antiguos -->
+        {% for message in messages %}
+            <p><b>{{ message.sender.username }}:</b> {{ message.message }}</p>
+        {% endfor %}
+    </div>
     <input id="chat-message-input" type="text" size="100">
     <input id="chat-message-submit" type="button" value="Send">
 
@@ -13,13 +18,26 @@
         const roomName = "{{ room_name }}";
         const receiver = "{{ receiver }}";
         const isPrivateChat = {{ is_private_chat|yesno:"true,false" }};
+
+        // Crear un nombre de grupo único para el chat individual o grupal
+        let roomGroupName;
+        if (isPrivateChat) {
+            if ("{{ request.user.username }}" < roomName) {
+                roomGroupName = `chat_{{ request.user.username }}_${roomName}`;
+            } else {
+                roomGroupName = `chat_${roomName}_{{ request.user.username }}`;
+            }
+        } else {
+            roomGroupName = `chat_${roomName}`;
+        }
+
         const chatSocket = new WebSocket(
             'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
         );
 
         chatSocket.onmessage = function(e) {
             const data = JSON.parse(e.data);
-            document.querySelector('#chat-log').innerHTML += ('<b>' + data.sender + ':</b> ' + data.message + '<br>');
+            document.querySelector('#chat-log').innerHTML += ('<p><b>' + data.sender + ':</b> ' + data.message + '</p>');
         };
 
         chatSocket.onclose = function(e) {

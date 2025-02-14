@@ -1,35 +1,58 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">        
+    <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
+
     <title>Chat App</title>
-</head>
-<body>
-    <h1>Bienvenido al Chat: {{user.username}}</h1>
-    <a href="{% url 'login' %}">cerrar</a>
+  </head>
+  <body>
+    <div class="container ">
+      <nav class="navbar  navbar-light bg-light color-nav">
+        <a class="navbar-brand" href="#"><h1>Bienvenido usuario: {{user.username}}</h1></a>
+        <a href="{% url 'login' %}">Cerrar sesión</a>
+
+      </nav>
+    </div>
+    
+
+    <h1>Chats</h1>
     <!-- Sección de salas disponibles -->
-    <h2>Salas disponibles:</h2>
-    <ul>
-        {% for room in chat_rooms %}
-            <li>
-                <a href="{% url 'room' room.name request.user.username %}">
-                    {{ room.name }}
-                </a>
-            </li>
-        {% endfor %}
+    <h2>Grupos:</h2>
+    <div class="col-4"
+    <ul class="list-group">
+      {% for room in chat_rooms %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <a href="{% url 'room' room.name request.user.username %}">
+          {{ room.name }}
+          <span class="badge badge-primary badge-pill">12</span>
+        </a>
+      </li>
+      {% endfor %}
     </ul>
 
     <!-- Sección de lista de usuarios -->
-    <h2>Lista de Usuarios:</h2>
-    <ul>
-        {% for user in users %}
-            <li>
-                <a href="{% url 'room' user.username request.user.username %}">
-                    {{ user.username }}
-                </a>
-            </li>
-        {% endfor %}
+    <h2>Usuarios:</h2>
+    <ul class="list-group">
+      {% for user in users %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <a href="{% url 'room' user.username request.user.username %}">
+          {{ user.username }}
+          <span class="badge badge-primary badge-pill">1</span>
+        </a>
+      </li>
+      {% endfor %}
     </ul>
+<div>
 
-  
-</body>
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+  </body>
 </html>

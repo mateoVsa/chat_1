@@ -1,0 +1,23 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #ffffff;
+  height: 100vh;
+}
+.login {
+  margin-top: 5vh;
+}
+.brd {
+  margin-right: 50%;
+  margin-left: 30%;
+  background-color: rgb(130, 187, 236) !important;
+  text-align: center;
+  -webkit-box-shadow: 0 30px 60px 0 rgba(0,0,0,0.3);
+  box-shadow: 0 30px 60px 0 rgba(0,0,0,0.3);
+}
+.color-nav{
+  background-color: rgb(130, 187, 236) !important;
+}
+h1 {
+  color: #000000;
+}
