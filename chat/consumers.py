@@ -40,11 +40,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
         sender = text_data_json['sender']
-        receiver = text_data_json['receiver']
+        receiver = text_data_json['receiver']  # Obtener el receiver del mensaje
 
         # Obtener usuarios
         sender_user = await self.get_user(sender)
-        receiver_user = await self.get_user(receiver)
+        receiver_user = await self.get_user(receiver)  # Obtener el objeto User del receiver
 
         # Verificar si los usuarios existen
         if sender_user is None or receiver_user is None:
@@ -89,6 +89,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def save_message(self, sender, receiver, message):
+        # Guardar el mensaje en la base de datos
         Message.objects.create(sender=sender, receiver=receiver, message=message)
 
     @database_sync_to_async

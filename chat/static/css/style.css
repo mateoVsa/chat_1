@@ -15,9 +15,142 @@ body {
   -webkit-box-shadow: 0 30px 60px 0 rgba(0,0,0,0.3);
   box-shadow: 0 30px 60px 0 rgba(0,0,0,0.3);
 }
-.color-nav{
+.navbar{
   background-color: rgb(130, 187, 236) !important;
 }
 h1 {
   color: #000000;
+}
+.chat-sidebar {
+  background: #f8f9fa;
+  height: 100vh;
+  padding: 15px;
+  border-right: 1px solid #ddd;
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+/* Estilos del área de chat */
+
+.chat-header {
+  background: #f1f1f1;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+
+.message {
+  max-width: 75%;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  display: inline-block;
+}
+
+/* Estilo del input */
+.chat-input {
+  display: flex;
+  margin-top: 10px;
+}
+
+.chat-input input {
+  flex-grow: 1;
+  margin-right: 10px;
+}
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 90vh;
+  max-width: 800px;
+  margin: 20px auto;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f8f9fa;
+}
+
+/* Encabezado del chat */
+.chat-header {
+  background: #007bff;
+  color: white;
+  padding: 10px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* Caja de mensajes */
+.chat-box {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Mensaje base */
+.message {
+  display: flex;
+  max-width: 70%;
+  margin-bottom: 10px;
+}
+
+/* Estilo de mensaje recibido */
+.message.received {
+  align-self: flex-start;
+  background-color: #eeeeee;
+  padding: 10px;
+  border-radius: 15px 15px 15px 0;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilo de mensaje enviado */
+.message.sent {
+  align-self: flex-end;
+  background-color: #dcf8c6;
+  padding: 10px;
+  border-radius: 15px 15px 0 15px;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Contenido del mensaje */
+.message-content {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Estilos del texto del mensaje */
+.message p {
+  margin: 5px 0 0;
+  font-size: 14px;
+  word-wrap: break-word;
+}
+
+/* Input y botón de enviar */
+.chat-input {
+  display: flex;
+  padding: 10px;
+  background: white;
+  border-top: 1px solid #ccc;
+}
+
+.chat-input input {
+  flex-grow: 1;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.chat-input button {
+  margin-left: 10px;
+}
+
+.btn-success{
+  background-color: #007bff !important;
+  border-color: #007bff !important;
 }
