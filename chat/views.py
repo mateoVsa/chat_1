@@ -1,11 +1,14 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth import login
+from django.contrib.auth import login, logout,authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.db.models import Q  # Importar Q para consultas complejas
 from .models import ChatRoom, Message
 from .forms import ChatRoomForm
+from django.contrib.messages import get_messages
+from django.contrib import messages
+
 
 
 # Verificar si el usuario es administrador o staff
@@ -13,7 +16,13 @@ def is_admin(user):
     return user.is_staff or user.is_superuser
 
 
-# Vista para crear salas de chat (solo para administradores)
+
+# Custom logout para permitir el deslogeo o cierre de sesion del usuario
+def custom_logout(request):
+    logout(request)
+    return redirect('login')
+
+# Vista para crear salas de chat (only admins)
 @login_required
 @user_passes_test(is_admin)
 def create_chat_room(request):
@@ -95,6 +104,26 @@ def signup(request):
             user = form.save()
             login(request, user)
             return redirect('index')
+        else:
+            messages.error(request,"Intente de nuevo.")
     else:
-        form = UserCreationForm()
+        form = UserCreationForm() 
     return render(request, 'registration/signup.html', {'form': form})
+# login que muestra error cuando la autenticación es fallida
+def custom_login(request):
+    if request.method == 'POST':
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        
+        user = authenticate(request, username=username, password=password)
+        
+        if user:
+            login(request,user)
+            messages.success(request, "Inicio de sesion exitoso")
+            return redirect('index')
+        else:
+            print("autenticacion fallida")
+            messages.error(request, "Credenciales incorrectas. Intente de nuevo, porfavor! ")
+    
+
+    return render(request, 'registration/login.html')

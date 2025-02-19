@@ -2,30 +2,26 @@ body {
   margin: 0;
   padding: 0;
   background-color: #ffffff;
-  height: 100vh;
+  overflow: hidden;
 }
 .login {
   margin-top: 5vh;
 }
-.brd {
-  margin-right: 50%;
-  margin-left: 30%;
-  background-color: rgb(130, 187, 236) !important;
-  text-align: center;
-  -webkit-box-shadow: 0 30px 60px 0 rgba(0,0,0,0.3);
-  box-shadow: 0 30px 60px 0 rgba(0,0,0,0.3);
-}
+
 .navbar{
-  background-color: rgb(130, 187, 236) !important;
+  background-color: #007bff !important;
+}
+.navbar-light .navbar-brand{
+  color: #eeeeee !important;
 }
 h1 {
-  color: #000000;
+  color: #ffffff;
 }
 .chat-sidebar {
-  background: #f8f9fa;
+  background: #868c9267;
   height: 100vh;
   padding: 15px;
-  border-right: 1px solid #ddd;
+  border-right: 1px solid #868c92;
 }
 
 .sidebar-header {
@@ -56,6 +52,7 @@ h1 {
 .chat-input {
   display: flex;
   margin-top: 10px;
+  background-color: #868c92a8 !important;
 }
 
 .chat-input input {
@@ -65,18 +62,17 @@ h1 {
 .chat-container {
   display: flex;
   flex-direction: column;
-  height: 90vh;
-  max-width: 800px;
+  height: 88vh;
+  max-width: 900px;
   margin: 20px auto;
   border: 1px solid #ccc;
   border-radius: 10px;
-  overflow: hidden;
   background: #f8f9fa;
 }
 
 /* Encabezado del chat */
 .chat-header {
-  background: #007bff;
+  background: #868c92;
   color: white;
   padding: 10px;
   text-align: center;
@@ -88,9 +84,12 @@ h1 {
 .chat-box {
   flex-grow: 1;
   overflow-y: auto;
-  padding: 15px;
+  overflow-x: hidden;
+  padding: 10px;
   display: flex;
+  border-radius: 5px ;
   flex-direction: column;
+  background-color: #868c9250;
 }
 
 /* Mensaje base */
@@ -112,12 +111,15 @@ h1 {
 /* Estilo de mensaje enviado */
 .message.sent {
   align-self: flex-end;
-  background-color: #dcf8c6;
+  background-color: #2bff0049;
   padding: 10px;
   border-radius: 15px 15px 0 15px;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
 }
-
+.col-md-8{
+  background-color: #007bff42 !important;
+  margin-bottom: 0;
+}
 /* Contenido del mensaje */
 .message-content {
   display: flex;
@@ -151,6 +153,12 @@ h1 {
 }
 
 .btn-success{
-  background-color: #007bff !important;
-  border-color: #007bff !important;
+  background-color: #20a006 !important;
+  border-color: #20a006 !important;
 }
+
+/*estilos login y signup */
+
+
+/*signup styles*/
+

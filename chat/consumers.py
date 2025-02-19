@@ -56,6 +56,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Guardar el mensaje en la base de datos
         await self.save_message(sender_user, receiver_user, message)
 
+        # notificaciones 
+        
+        #await self.channel_layer.group_send(
+        #    'notifications',
+        #    {
+        #        'type': 'send_notification',
+        #       'message': f'Nuevo mensaje de {sender} en {self.room_name}',
+        #        'sender': sender
+        #    }
+        #)
+        
+        
         # Enviar el mensaje al grupo de la sala
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -96,3 +108,30 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def is_chat_room(self, room_name):
         # Verificar si el room_name es una sala de chat grupal
         return ChatRoom.objects.filter(name=room_name).exists()
+    
+    
+#class notificationConsumer(AsyncWebsocketConsumer):
+#    async def connect(self):
+#        await self.channel_layer.group_add(
+#            'notifications',
+#            self.channel_name
+#        )
+#       await self.accept()
+#  
+#    async def disconnect(self, close_code):
+#        await self.channel_layer.group_discard(
+#            'notifications',
+#            self.channel_name
+#        )
+ #   
+ #   async def send_notifications(self,event):
+  #      message =  event['message']
+#        sender =  event['sender']
+#        
+#        await self.send(text_data= json.dumps({
+#            'type': 'notification',
+#            'message': message,
+#            'sender': sender
+#        }))
+        
+        

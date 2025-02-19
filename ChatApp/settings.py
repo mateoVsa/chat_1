@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-^w*u099hjbg*=2palye9+ud(a&6jo-o4@yp5%v6bofdrp+%afz
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['172.17.1.120','127.0.0.1']
+ALLOWED_HOSTS = ['172.17.1.120','127.0.0.1','localhost']
 
 
 # Application definition
@@ -131,3 +131,7 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',  # Usar backend en memoria
     },
 }
+
+LOGOUT_REDIRECT_URL = 'login'
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'

@@ -22,6 +22,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('chat/', include('chat.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('accounts/signup', views.signup, name='signup'),# URLs de autenticación
-    path('', RedirectView.as_view(url='/chat/')),
+    path('accounts/profile/', views.index, name='index'),
+    path('accounts/signup', views.signup, name='signup'),
+    path('logout/', views.custom_logout, name='logout'),
+    path('login/',views.custom_login, name = 'login'),
+    path('', RedirectView.as_view(url='/login/')),
 ]
