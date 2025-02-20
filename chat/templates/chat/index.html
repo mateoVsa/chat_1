@@ -1,86 +1,17 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Chat App{% endblock %}</title>
 
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-    <!-- Iconos de Google -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <!-- Estilos personalizados -->
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body>
+{% extends 'chat/base.html' %}
 
-<!-- Barra de navegación -->
-<nav class="navbar navbar-light bg-light">
-    <b><a class="navbar-brand" href="{% url 'index' %}">Bienvenido, {{ user.username }}</a></b>
-    <a href="{% url 'logout' %}" class="btn btn-danger btn-sm">Cerrar sesión</a>
-</nav>
+{% block title %}Lista de Chats{% endblock %}
 
-<div class="container-fluid">
-    <div class="row">
-        <!-- Sidebar -->
-        <div class="col-md-4 chat-sidebar">
-            
-            <h6>Usuarios:</h6>
-            <ul class="list-group">
-                {% for user in users %}
-                <li class="list-group-item">
-                    <a href="{% url 'room' user.username user.username %}">{{ user.username }}</a>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <!-- Bloque de contenido para -->
-        <div class="col-md-8">
-            {% block messages %}{% endblock %}
-        </div>
-    </div>
-</div>
-
-<!-- Scripts de Bootstrap -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-
-</body>
-
-    
-<!--<script>
-    // Conectar al WebSocket de notificaciones
-const notificationSocket = new WebSocket(
-    'ws://' + window.location.host + '/ws/notifications/'
-);
-
-notificationSocket.onmessage = function(e) {
-    const data = JSON.parse(e.data);
-
-    if (data.type === 'notification') {
-        // Mostrar la notificación
-        if (Notification.permission === "granted") {
-            new Notification(data.sender, {
-                body: data.message,
-                icon: "{% static 'img/chat-icon.png' %}"
-            });
-        } else if (Notification.permission !== "denied") {
-            // Solicitar permisos si no están concedidos
-            Notification.requestPermission().then(function(permission) {
-                if (permission === "granted") {
-                    new Notification(data.sender, {
-                        body: data.message,
-                        icon: "{% static 'img/chat-icon.png' %}"
-                    });
-                }
-            });
-        }
-    }
-};
-
-notificationSocket.onclose = function(e) {
-    console.error('Notificación socket cerrado inesperadamente');
-};
-</script>
-</html>-->
+{% block content %}
+    <h4>Chat en vivo</h4>
+    <ul class="list-group">
+        {% for room in chat_rooms %}
+            <li class="list-group-item">
+                <a href="#">Empieza a chatear.</a>
+            </li>
+        {% empty %}
+            <li class="list-group-item">Empieza a chatear</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

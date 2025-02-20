@@ -73,7 +73,7 @@
         ruleSpecial.classList.toggle("valid", /[@#$%^&*(),.?":{}|<>]/.test(password));
         ruleSpecial.innerHTML = /[@#$%^&*(),.?":{}|<>]/.test(password) ? "- Al menos un carácter especial" : "x Al menos un carácter especial";
     });
-
+    // validacion para contraseñas iguales
     document.addEventListener("DOMContentLoaded", function () {
         document.querySelector("form").addEventListener("submit", function (e) {
             let password1 = document.getElementById("id_password1");

@@ -3,6 +3,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import Message, ChatRoom
 from django.contrib.auth.models import User
 from channels.db import database_sync_to_async
+from datetime import datetime
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -41,7 +42,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = text_data_json['message']
         sender = text_data_json['sender']
         receiver = text_data_json['receiver']  # Obtener el receiver del mensaje
-
+        timestamp = datetime.now().strftime('%H:%M:%S')
         # Obtener usuarios
         sender_user = await self.get_user(sender)
         receiver_user = await self.get_user(receiver)  # Obtener el objeto User del receiver
@@ -56,18 +57,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Guardar el mensaje en la base de datos
         await self.save_message(sender_user, receiver_user, message)
 
-        # notificaciones 
-        
-        #await self.channel_layer.group_send(
-        #    'notifications',
-        #    {
-        #        'type': 'send_notification',
-        #       'message': f'Nuevo mensaje de {sender} en {self.room_name}',
-        #        'sender': sender
-        #    }
-        #)
-        
-        
         # Enviar el mensaje al grupo de la sala
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -76,6 +65,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'message': message,
                 'sender': sender,
                 'receiver': receiver,
+                'timestamp':timestamp,
             }
         )
 
@@ -108,30 +98,3 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def is_chat_room(self, room_name):
         # Verificar si el room_name es una sala de chat grupal
         return ChatRoom.objects.filter(name=room_name).exists()
-    
-    
-#class notificationConsumer(AsyncWebsocketConsumer):
-#    async def connect(self):
-#        await self.channel_layer.group_add(
-#            'notifications',
-#            self.channel_name
-#        )
-#       await self.accept()
-#  
-#    async def disconnect(self, close_code):
-#        await self.channel_layer.group_discard(
-#            'notifications',
-#            self.channel_name
-#        )
- #   
- #   async def send_notifications(self,event):
-  #      message =  event['message']
-#        sender =  event['sender']
-#        
-#        await self.send(text_data= json.dumps({
-#            'type': 'notification',
-#            'message': message,
-#            'sender': sender
-#        }))
-        
-        

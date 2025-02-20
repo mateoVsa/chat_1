@@ -1,7 +1,9 @@
-{% extends 'chat/index.html' %}
+{% extends 'chat/base.html' %}
 {% load static %}
 
-{% block messages %}
+{% block title %}Chat con {{ room_name }}{% endblock %}
+
+{% block content %}
 <div class="chat-container">
     <div class="chat-header">
         <h5>Chat con {{ room_name }}</h5>
@@ -13,6 +15,7 @@
             <div class="message-content">
                 <strong>{{ message.sender.username }}</strong>
                 <p>{{ message.message }}</p>
+                <p class="chat-time">{{message.timestamp | date:'H:i'}}</p>
             </div>
         </div>
         {% endfor %}
@@ -29,19 +32,21 @@
     const receiver = "{{ receiver }}";
     const current_user = "{{ request.user.username }}";
     const isPrivateChat = {{ is_private_chat|yesno:"true,false" }};
-
+//funcion para que al ingresar al chat, se vea el ultimo mensaje
     function scrollToEnd() {
         const chatLog = document.querySelector('#chat-log');
         chatLog.scrollTop = chatLog.scrollHeight;
     }
-
+// se crea un WebSocket
     const chatSocket = new WebSocket(
         'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
     );
-
+//funcion para las notici
     chatSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
 
+        const timestamp = new Date(data.timestamp);
+        const formattedTime = timestamp.toLocaleTimeString([],{hour:'2-digit', minute:'2-digit'});
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message');
 
@@ -58,10 +63,11 @@
                 });
             }
         }
-
+        
         messageDiv.innerHTML = `<div class="message-content">
                                     <strong>${data.sender}</strong>
                                     <p>${data.message}</p>
+                                     <p class="chat-time">${formattedTime}</p>
                                 </div>`;
         document.querySelector('#chat-log').appendChild(messageDiv);
 

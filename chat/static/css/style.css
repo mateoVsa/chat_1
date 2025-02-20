@@ -9,7 +9,7 @@ body {
 }
 
 .navbar{
-  background-color: #007bff !important;
+  background-color: #004085 !important;
 }
 .navbar-light .navbar-brand{
   color: #eeeeee !important;
@@ -34,9 +34,9 @@ h1 {
 /* Estilos del área de chat */
 
 .chat-header {
-  background: #f1f1f1;
+  background: #004085 ;
   padding: 10px;
-  border-radius: 5px;
+  border-radius: 0;
 }
 
 
@@ -51,8 +51,7 @@ h1 {
 /* Estilo del input */
 .chat-input {
   display: flex;
-  margin-top: 10px;
-  background-color: #868c92a8 !important;
+  background-color: #004085 !important;
 }
 
 .chat-input input {
@@ -66,13 +65,13 @@ h1 {
   max-width: 900px;
   margin: 20px auto;
   border: 1px solid #ccc;
-  border-radius: 10px;
+  border-radius: 0;
   background: #f8f9fa;
 }
 
 /* Encabezado del chat */
 .chat-header {
-  background: #868c92;
+  background: #004085;
   color: white;
   padding: 10px;
   text-align: center;
@@ -87,7 +86,7 @@ h1 {
   overflow-x: hidden;
   padding: 10px;
   display: flex;
-  border-radius: 5px ;
+  border-radius: 0 ;
   flex-direction: column;
   background-color: #868c9250;
 }
@@ -157,8 +156,13 @@ h1 {
   border-color: #20a006 !important;
 }
 
-/*estilos login y signup */
+.btn-primary{
+  background-color: #20a006 !important;
+  border-color: #20a006 !important;
+}
 
-
-/*signup styles*/
-
+.chat-time{
+  font-size: 10px !important;
+  text-align: end;
+  color: #868c92;
+}
