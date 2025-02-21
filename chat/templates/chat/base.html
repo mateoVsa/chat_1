@@ -45,5 +45,45 @@
 <!-- Scripts de Bootstrap -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 
+<script>
+    const notificationSocket = new WebSocket(
+        'ws://' + window.location.host + '/ws/notifications/'
+    );
+
+    notificationSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+
+        if (data.type === 'send_notification' && data.receiver === "{{ request.user.username }}") {
+            if (Notification.permission === "granted") {
+                new Notification("Mensaje de " + data.sender, {
+                    body: data.message,
+                    icon: "{% static 'img/chat-icon.png' %}"
+                });
+            } else if (Notification.permission !== "denied") {
+                Notification.requestPermission().then(function(permission) {
+                    if (permission === "granted") {
+                        new Notification("Mensaje de " + data.sender, {
+                            body: data.message,
+                            icon: "{% static 'img/chat-icon.png' %}"
+                        });
+                    }
+                });
+            }
+        }
+    };
+
+    notificationSocket.onclose = function(e) {
+        console.error("Notificación socket cerrado inesperadamente");
+        setTimeout(function(){
+            location.reload();
+        },3000)
+    };
+
+    // Solicitar permiso de notificación al cargar cualquier página
+    if (Notification.permission !== "granted") {
+        Notification.requestPermission();
+    }
+</script>
+
 </body>
 </html>

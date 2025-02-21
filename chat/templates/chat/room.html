@@ -41,12 +41,14 @@
     const chatSocket = new WebSocket(
         'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
     );
+
+
 //funcion para las notici
     chatSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
 
-        const timestamp = new Date(data.timestamp);
-        const formattedTime = timestamp.toLocaleTimeString([],{hour:'2-digit', minute:'2-digit'});
+        const timestamp = data.timestamp;
+        //const formattedTime = timestamp.toLocaleTimeString();
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message');
 
@@ -56,18 +58,12 @@
             messageDiv.classList.add('received');
 
             // Notificación para mensajes nuevos
-            if (Notification.permission === "granted") {
-                new Notification("Nuevo mensaje de " + data.sender, {
-                    body: data.message,
-                    icon: "{% static 'img/chat-icon.png' %}"
-                });
-            }
         }
         
         messageDiv.innerHTML = `<div class="message-content">
                                     <strong>${data.sender}</strong>
                                     <p>${data.message}</p>
-                                     <p class="chat-time">${formattedTime}</p>
+                                     <p class="chat-time">${timestamp}</p>
                                 </div>`;
         document.querySelector('#chat-log').appendChild(messageDiv);
 

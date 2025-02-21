@@ -21,7 +21,7 @@ h1 {
   background: #868c9267;
   height: 100vh;
   padding: 15px;
-  border-right: 1px solid #868c92;
+  border-right: 10px solid #004085;
 }
 
 .sidebar-header {
@@ -51,7 +51,7 @@ h1 {
 /* Estilo del input */
 .chat-input {
   display: flex;
-  background-color: #004085 !important;
+  background-color: #032a53 !important;
 }
 
 .chat-input input {

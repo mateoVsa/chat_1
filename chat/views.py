@@ -7,8 +7,8 @@ from django.db.models import Q
 from django.contrib import messages
 from .models import ChatRoom, Message
 from .forms import ChatRoomForm
-
-
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 # Verificar si el usuario es administrador o staff
 def is_admin(user):
     return user.is_staff or user.is_superuser
@@ -18,9 +18,7 @@ def is_admin(user):
 def custom_logout(request):
     logout(request)
     return redirect('login')
-
-
-# Vista para crear salas de chat (solo admins)
+# Vista para crear salas de chat (solo admins) NO SE OCUPA
 @login_required
 @user_passes_test(is_admin)
 def create_chat_room(request):
@@ -33,7 +31,21 @@ def create_chat_room(request):
         form = ChatRoomForm()
     return render(request, 'chat/create_chat_room.html', {'form': form})
 
-
+#Funcion para enviar notificaciones
+def send_notification(sender,receiver,message):
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        "notifications",
+        {
+            "type": "send_notification",
+            "sender": sender,
+            "message": message,
+            "receiver": receiver,
+            
+        },
+    )
+    
+    
 # Vista para la sala de chat
 @login_required
 def room(request, room_name, receiver):
@@ -47,17 +59,18 @@ def room(request, room_name, receiver):
         is_private_chat = True
     except User.DoesNotExist:
         is_private_chat = False
-
+    
     if is_private_chat:
         messages_list = Message.objects.filter(
             (Q(sender=request.user) & Q(receiver__username=room_name)) |
             (Q(sender__username=room_name) & Q(receiver=request.user))
         ).order_by('timestamp')
-        for msg in messages_list:
-            msg.formatted_time = msg.timestamp.strftime("%H:%M;%S")
     else:
         messages_list = Message.objects.filter(receiver__username=room_name).order_by('timestamp')
 
+    
+    send_notification(sender=request.user.username, receiver=room_name , message = "")
+    
     return render(request, 'chat/room.html', {
         'room_name': room_name,
         'receiver': receiver,

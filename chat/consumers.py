@@ -40,24 +40,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
-        sender = text_data_json['sender']
-        receiver = text_data_json['receiver']  # Obtener el receiver del mensaje
-        timestamp = datetime.now().strftime('%H:%M:%S')
-        # Obtener usuarios
-        sender_user = await self.get_user(sender)
-        receiver_user = await self.get_user(receiver)  # Obtener el objeto User del receiver
+        sender = self.scope['user'].username
+        receiver = text_data_json['receiver']
+        timestamp = datetime.now().strftime('%H:%M')
 
-        # Verificar si los usuarios existen
+        sender_user = await self.get_user(sender)
+        receiver_user = await self.get_user(receiver)
+
         if sender_user is None or receiver_user is None:
-            await self.send(text_data=json.dumps({
-                'error': 'Usuario no encontrado.',
-            }))
+            await self.send(text_data=json.dumps({'error': 'Usuario no encontrado.'}))
             return
 
-        # Guardar el mensaje en la base de datos
+        # Guardar el mensaje en la BD
         await self.save_message(sender_user, receiver_user, message)
 
-        # Enviar el mensaje al grupo de la sala
+        # Enviar el mensaje al grupo de chat
         await self.channel_layer.group_send(
             self.room_group_name,
             {
@@ -65,7 +62,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'message': message,
                 'sender': sender,
                 'receiver': receiver,
-                'timestamp':timestamp,
+                'timestamp': timestamp,
+            }
+        )
+
+        # Enviar una notificación al destinatario si está en línea
+        await self.channel_layer.group_send(
+            f"notifications_{receiver}",
+            {
+                'type': 'send_notification',
+                'sender': sender,
+                'receiver': receiver,
+                'message': message
             }
         )
 
@@ -74,12 +82,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = event['message']
         sender = event['sender']
         receiver = event['receiver']
+        timestamp = event['timestamp']
 
         # Enviar el mensaje al WebSocket
         await self.send(text_data=json.dumps({
             'message': message,
             'sender': sender,
             'receiver': receiver,
+            'timestamp':timestamp,
         }))
 
     @database_sync_to_async
@@ -96,5 +106,37 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def is_chat_room(self, room_name):
-        # Verificar si el room_name es una sala de chat grupal
+        # Verificar si el room_name es una sala de chat grupall
         return ChatRoom.objects.filter(name=room_name).exists()
+    
+class NotificationConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.user = self.scope["user"]
+        if not self.user.is_authenticated:
+            await self.close()
+            return
+
+        self.room_group_name = f"notifications_{self.user.username}"
+
+        await self.channel_layer.group_add(
+            self.room_group_name,
+            self.channel_name
+        )
+
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(
+            self.room_group_name,
+            self.channel_name
+        )
+
+    async def send_notification(self, event):
+        """ Enviar notificación a un usuario específico. """
+        await self.send(text_data=json.dumps({
+            'type': 'send_notification',
+            'sender': event['sender'],
+            'receiver': event['receiver'],
+            'message': event['message']
+        }))
+    
