@@ -19,17 +19,17 @@ def custom_logout(request):
     logout(request)
     return redirect('login')
 # Vista para crear salas de chat (solo admins) NO SE OCUPA
-@login_required
-@user_passes_test(is_admin)
-def create_chat_room(request):
-    if request.method == 'POST':
-        form = ChatRoomForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('index')
-    else:
-        form = ChatRoomForm()
-    return render(request, 'chat/create_chat_room.html', {'form': form})
+# @login_required
+# @user_passes_test(is_admin)
+# def create_chat_room(request):
+#     if request.method == 'POST':
+#         form = ChatRoomForm(request.POST)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('index')
+#     else:
+#         form = ChatRoomForm()
+#     return render(request, 'chat/create_chat_room.html', {'form': form})
 
 #Funcion para enviar notificaciones
 def send_notification(sender,receiver,message):
@@ -117,7 +117,7 @@ def signup(request):
     return render(request, 'registration/signup.html', {'form': form})
 
 
-# Vista personalizada de login con mensaje de error
+# Vista de login
 def custom_login(request):
     if request.method == 'POST':
         username = request.POST.get("username")

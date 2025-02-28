@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-^w*u099hjbg*=2palye9+ud(a&6jo-o4@yp5%v6bofdrp+%afz
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['172.17.1.120','127.0.0.1','localhost','172.17.0.84']
+ALLOWED_HOSTS = ['127.0.0.1','localhost','172.17.0.188']
 
 
 # Application definition
@@ -78,8 +78,12 @@ WSGI_APPLICATION = 'ChatApp.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE':'django.db.backends.postgresql_psycopg2',
+            'NAME': 'chatdb',
+            'USER': 'chatuser',
+            'PASSWORD':'admin123_sln',
+            'HOST': 'localhost',
+            'PORT': '5432', 
     }
 }
 
