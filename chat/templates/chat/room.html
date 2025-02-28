@@ -38,10 +38,14 @@
         chatLog.scrollTop = chatLog.scrollHeight;
     }
 // se crea un WebSocket
-    const chatSocket = new WebSocket(
+    {% comment %} const chatSocket = new WebSocket(
         'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
-    );
+    ); {% endcomment %}
 
+    const wsProchat = window.location.protocol === "https:" ? "wss" : "ws";
+    const chatSocket = new WebSocket(
+        wsProchat + "://" + window.location.host + '/ws/chat/' + roomName + '/'
+    );
 
 //funcion para las notici
     chatSocket.onmessage = function(e) {

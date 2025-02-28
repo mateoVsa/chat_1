@@ -46,8 +46,12 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    const notificationSocket = new WebSocket(
+    {% comment %} const notificationSocket = new WebSocket(
         'ws://' + window.location.host + '/ws/notifications/'
+    ); {% endcomment %}
+    const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
+    const notificationSocket = new WebSocket(
+        wsProtocol + "://" + window.location.host + "/ws/notifications/"
     );
 
     notificationSocket.onmessage = function(e) {
