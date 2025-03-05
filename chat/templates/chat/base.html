@@ -26,7 +26,7 @@
             <h6>Usuarios:</h6>
             <ul class="list-group">
                 {% for user in users %}
-                <li class="list-group-item">
+                <li class="list-group-item {% if user.username == active_user %}active-user{% endif %}">
                     <a href="{% url 'room' user.username user.username %}">{{ user.username }}</a>
                 </li>
                 {% empty %}
@@ -46,7 +46,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    {% comment %} const notificationSocket = new WebSocket(
+     {% comment %} const notificationSocket = new WebSocket(
         'ws://' + window.location.host + '/ws/notifications/'
     ); {% endcomment %}
     const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
@@ -69,7 +69,7 @@
                         new Notification("Mensaje de " + data.sender, {
                             body: data.message,
                             icon: "{% static 'img/chat-icon.png' %}"
-                        });
+                        }); 
                     }
                 });
             }

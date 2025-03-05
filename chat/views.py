@@ -48,7 +48,7 @@ def send_notification(sender,receiver,message):
     
 # Vista para la sala de chat
 @login_required
-def room(request, room_name, receiver):
+def room(request, room_name, receiver, ):
     if request.user.is_staff or request.user.is_superuser:
         users = User.objects.exclude(username=request.user.username)  # Admins ven a todos
     else:
@@ -77,6 +77,7 @@ def room(request, room_name, receiver):
         'is_private_chat': is_private_chat,
         'messages': messages_list,
         'users': users,  # Se envía la lista de usuarios al template
+        'active_user': room_name,
     })
 
 

@@ -171,3 +171,9 @@ a {
   color: black !important;
   text-transform: capitalize;
 }
+
+.active-user {
+  background-color: #28a745 !important; /* Verde */
+  color: white !important;
+  font-weight: bold;
+}
