@@ -44,22 +44,29 @@
 
 <!-- Scripts de Bootstrap -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-
+<audio id="notificationSound">
+    <source src="{% static "audio/notification.mp3" %}">
+</audio>
 <script>
-     {% comment %} const notificationSocket = new WebSocket(
+    const notificationSound = new Audio("{% static 'audio/notification.mp3' %}"); // Sonido de alerta
+    let originalTitle = document.title; // Guarda el título original
+    let blinkInterval; 
+
+      {% comment %} const notificationSocket = new WebSocket(
         'ws://' + window.location.host + '/ws/notifications/'
-    ); {% endcomment %}
-    const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
+    );  {% endcomment %}
+     const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
     const notificationSocket = new WebSocket(
         wsProtocol + "://" + window.location.host + "/ws/notifications/"
     );
 
     notificationSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
-
+    
         if (data.type === 'send_notification' && data.receiver === "{{ request.user.username }}") {
+            
             if (Notification.permission === "granted") {
-                new Notification("Mensaje de " + data.sender, {
+                new Notification("🔔 Nuevo mensaje de: " + data.sender, {
                     body: data.message,
                     icon: "{% static 'img/chat-icon.png' %}"
                 });
@@ -69,24 +76,34 @@
                         new Notification("Mensaje de " + data.sender, {
                             body: data.message,
                             icon: "{% static 'img/chat-icon.png' %}"
-                        }); 
+                        });
                     }
                 });
             }
+    
+            notificationSound.play();
+    
+            if (document.hidden) {
+                blinkInterval = setInterval(() => {
+                    document.title = document.title === "🔔 Nuevo mensaje!" ? originalTitle : "🔔 Nuevo mensaje!";
+                }, 1000);
+            }
         }
     };
-
-    notificationSocket.onclose = function(e) {
-        console.error("Notificación socket cerrado inesperadamente");
-        setTimeout(function(){
-            location.reload();
-        },3000)
-    };
-
-    // Solicitar permiso de notificación al cargar cualquier página
+    
+    // Restaurar título cuando el usuario regrese a la pestaña
+    document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) {
+            clearInterval(blinkInterval);
+            document.title = originalTitle;
+        }
+    });
+    
+    // Solicitar permisos de notificación al cargar la página
     if (Notification.permission !== "granted") {
         Notification.requestPermission();
     }
+    
 </script>
 
 </body>
