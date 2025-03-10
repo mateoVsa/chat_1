@@ -6,7 +6,7 @@
 {% block content %}
 <div class="chat-container">
     <div class="chat-header">
-        <h5>Chat con {{ room_name }}</h5>
+        <h5>{{ room_name }}</h5>
     </div>
     
     <div class="chat-box" id="chat-log">
@@ -23,7 +23,7 @@
 
     <div class="chat-input">
         <input type="text" id="chat-message-input" class="form-control" placeholder="Escribe un mensaje...">
-        <button id="chat-message-submit" class="btn btn-primary">Enviar</button>
+        <button id="chat-message-submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i></button>
     </div>
 </div>
 
@@ -38,14 +38,14 @@
         chatLog.scrollTop = chatLog.scrollHeight;
     }
 // se crea un WebSocket
-     {% comment %} const chatSocket = new WebSocket(
+      const chatSocket = new WebSocket(
         'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
-    );  {% endcomment %}
+    );  
 
-     const wsProchat = window.location.protocol === "https:" ? "wss" : "ws";
+     {% comment %} const wsProchat = window.location.protocol === "https:" ? "wss" : "ws";
     const chatSocket = new WebSocket(
         wsProchat + "://" + window.location.host + '/ws/chat/' + roomName + '/'
-    ); 
+    );  {% endcomment %}
 //funcion para las notici
     chatSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);

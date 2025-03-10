@@ -9,25 +9,34 @@
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
 
 <!-- Barra de navegación -->
 <nav class="navbar navbar-light bg-light">
-    <b><a class="navbar-brand" href="{% url 'index' %}">Bienvenido, {{ user.username }}</a></b>
-    <a href="{% url 'logout' %}" class="btn btn-danger btn-sm">Cerrar sesión</a>
+    
+    <b><a class="navbar-brand" href="{% url 'index' %}">
+<img src="{% static "img/sinat.svg"%}" width="200" height="50" class="d-inline-block align-center" alt="">       Bienvenido, {{ user.username }} 
+    </a>
+    
+    </b>
+    <a href="{% url 'logout' %}" class="btn btn-danger btn-sm"><i class="fas fa-sign-out-alt"></i></a>
 </nav>
 
 <div class="container-fluid">
     <div class="row">
+        
         <!-- Sidebar con la lista de usuarios -->
         <div class="col-md-4 chat-sidebar">
-            <h6>Usuarios:</h6>
+            <div class="chat-header-2">
+            <h5>Chats</h5>
+            </div>
             <ul class="list-group">
                 {% for user in users %}
                 <li class="list-group-item {% if user.username == active_user %}active-user{% endif %}">
-                    <a href="{% url 'room' user.username user.username %}">{{ user.username }}</a>
+                    <a class="btn" href="{% url 'room' user.username user.username %}">{{ user.username }}</a>
                 </li>
                 {% empty %}
                 <li class="list-group-item">No hay usuarios disponibles.</li>
@@ -49,17 +58,21 @@
 </audio>
 <script>
     const notificationSound = new Audio("{% static 'audio/notification.mp3' %}"); // Sonido de alerta
-    let originalTitle = document.title; // Guarda el título original
-    let blinkInterval; 
+let originalTitle = document.title; // Guarda el título original
+let blinkInterval;
+let alertShown = false;
 
-      {% comment %} const notificationSocket = new WebSocket(
+      const notificationSocket = new WebSocket(
         'ws://' + window.location.host + '/ws/notifications/'
-    );  {% endcomment %}
-     const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
+    );  
+     {% comment %} const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
     const notificationSocket = new WebSocket(
         wsProtocol + "://" + window.location.host + "/ws/notifications/"
-    );
-
+    ); {% endcomment %}
+ {% comment %} const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
+    const notificationSocket = new WebSocket(
+        wsProtocol + "://" + window.location.host + "/ws/notifications/"
+    ); {% endcomment %}
     notificationSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
     
@@ -68,14 +81,14 @@
             if (Notification.permission === "granted") {
                 new Notification("🔔 Nuevo mensaje de: " + data.sender, {
                     body: data.message,
-                    icon: "{% static 'img/chat-icon.png' %}"
+                    icon: "{% static 'img/cat.jpg' %}",
                 });
             } else if (Notification.permission !== "denied") {
                 Notification.requestPermission().then(function(permission) {
                     if (permission === "granted") {
                         new Notification("Mensaje de " + data.sender, {
                             body: data.message,
-                            icon: "{% static 'img/chat-icon.png' %}"
+                            icon: "{% static 'img/cat.jpg' %}"
                         });
                     }
                 });
@@ -86,9 +99,15 @@
             if (document.hidden) {
                 blinkInterval = setInterval(() => {
                     document.title = document.title === "🔔 Nuevo mensaje!" ? originalTitle : "🔔 Nuevo mensaje!";
+                   
                 }, 1000);
+                setTimeout(()=>{
+                    alert("Mensaje de " + data.sender);
+                   },500); 
             }
+            
         }
+        
     };
     
     // Restaurar título cuando el usuario regrese a la pestaña
@@ -103,6 +122,7 @@
     if (Notification.permission !== "granted") {
         Notification.requestPermission();
     }
+    
     
 </script>
 
