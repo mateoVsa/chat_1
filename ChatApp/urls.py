@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.urls import path, include
 from chat import views
 from django.views.generic import RedirectView
+from django.conf.urls.static import static
+from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('chat/', include('chat.urls')),
@@ -27,4 +29,5 @@ urlpatterns = [
     path('logout/', views.custom_logout, name='logout'),
     path('login/',views.custom_login, name = 'login'),
     path('', RedirectView.as_view(url='/login/')),
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+ 

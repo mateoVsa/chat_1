@@ -1,4 +1,9 @@
 import json
+import base64
+import os
+import uuid
+from django.core.files.base import ContentFile
+from django.conf import settings
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import Message, ChatRoom
 from django.contrib.auth.models import User
@@ -39,9 +44,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # Recibir mensaje del WebSocket
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        message = text_data_json['message']
+        message = text_data_json.get('message','') 
+        image_data = text_data_json.get('image','')
         sender = self.scope['user'].username
-        receiver = text_data_json['receiver']
+        receiver = text_data_json.get('receiver')
         timestamp = datetime.now().strftime('%H:%M')
 
         sender_user = await self.get_user(sender)
@@ -50,9 +56,27 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if sender_user is None or receiver_user is None:
             await self.send(text_data=json.dumps({'error': 'Usuario no encontrado.'}))
             return
+        
+        
+        image_url = None
+        if image_data:
+            try:
+                format, imgstr = image_data.split(';base64,')
+                ext = format.split('/')[-1]  # Obtener la extensión del archivo
+                file_name = f"{uuid.uuid4()}.{ext}"
+                file_path = os.path.join(settings.MEDIA_ROOT, "chat_images", file_name)
+                os.makedirs(os.path.dirname(file_path), exist_ok=True)
+                with open(file_path, "wb") as f:
+                    f.write(base64.b64decode(imgstr))
 
+                image_url = settings.MEDIA_URL + f"chat_images/{file_name}"
+
+            except Exception as e:
+                await self.send(text_data=json.dumps({'error': f'Error al procesar la imagen: {str(e)}'}))
+                return
+                
         # Guardar el mensaje en la BD
-        await self.save_message(sender_user, receiver_user, message)
+        await self.save_message(sender_user, receiver_user, message, image_url)
 
         # Enviar el mensaje al grupo de chat
         await self.channel_layer.group_send(
@@ -60,6 +84,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             {
                 'type': 'chat_message',
                 'message': message,
+                'image':image_url,
                 'sender': sender,
                 'receiver': receiver,
                 'timestamp': timestamp,
@@ -73,20 +98,22 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'type': 'send_notification',
                 'sender': sender,
                 'receiver': receiver,
-                'message': message
+                'message': message if message else "Foto",
             }
         )
 
     # Recibir mensaje del grupo de la sala
     async def chat_message(self, event):
-        message = event['message']
+        message = event.get('message','')
+        image_url = event.get('image','')
         sender = event['sender']
         receiver = event['receiver']
         timestamp = event['timestamp']
 
         # Enviar el mensaje al WebSocket
         await self.send(text_data=json.dumps({
-            'message': message,
+            'message': message if message else "",
+            'image':image_url if image_url else "",
             'sender': sender,
             'receiver': receiver,
             'timestamp':timestamp,
@@ -100,9 +127,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return None
 
     @database_sync_to_async
-    def save_message(self, sender, receiver, message):
+    def save_message(self, sender, receiver, message, image_url=None):
         # Guardar el mensaje en la base de datos
-        Message.objects.create(sender=sender, receiver=receiver, message=message)
+     return  Message.objects.create(
+         sender=sender, 
+         receiver=receiver, 
+         message=message if message else "",
+         image=image_url if image_url else None,
+         ) 
+      
 
     @database_sync_to_async
     def is_chat_room(self, room_name):

@@ -48,12 +48,12 @@ def send_notification(sender,receiver,message):
     
 # Vista para la sala de chat
 @login_required
-def room(request, room_name, receiver, ):
+def room(request, room_name, receiver):
     if request.user.is_staff or request.user.is_superuser:
         users = User.objects.exclude(username=request.user.username)  # Admins ven a todos
     else:
         users = User.objects.filter(is_staff=True)  # Usuarios normales solo ven staff y admin
-
+        users = User.objects.filter(is_superuser=True)
     try:
         user = User.objects.get(username=room_name)
         is_private_chat = True
@@ -89,7 +89,8 @@ def index(request):
     if request.user.is_staff or request.user.is_superuser:
         users = User.objects.exclude(username=request.user.username)  # Admins ven a todos
     else:
-        users = User.objects.filter(is_staff=True)  # Usuarios normales solo ven staff y admin
+        users = User.objects.filter(is_staff=True)
+        users = User.objects.filter(is_superuser=True) # Usuarios normales solo ven staff y admin
 
     return render(request, 'chat/index.html', {
         'chat_rooms': chat_rooms,
@@ -134,3 +135,20 @@ def custom_login(request):
             messages.error(request, "Credenciales incorrectas. Intente de nuevo.")
 
     return render(request, 'registration/login.html')
+# from django.db.models import Max
+# def chat_list(request):
+#     last_message = (
+#         Message.objects.filter(receiver = request.user)
+#         .values('sender')
+#         .annotate(last_message = Max('timestamp'))
+#         .order_by('-last_message')
+#     )
+    
+#     last_message_dict = {
+#         msg['sender']: Message.objects.filter(sender__id=msg['sender'],receiver=request.user)
+#         .order_by('-timestamp')
+#         .first()
+#         for msg in last_message
+#     }
+#     user= User.objects.filter(id__in=last_message_dict.keys())
+#     return render (request, 'chat/base.html',{'user':user,'last_message':last_message_dict}) lista de mensajes recientes

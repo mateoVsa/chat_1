@@ -17,11 +17,10 @@
 <!-- Barra de navegación -->
 <nav class="navbar navbar-light bg-light">
     
-    <b><a class="navbar-brand" href="{% url 'index' %}">
-<img src="{% static "img/sinat.svg"%}" width="200" height="50" class="d-inline-block align-center" alt="">       Bienvenido, {{ user.username }} 
+    <a class="navbar-brand" href="{% url 'index' %}">
+<img src="{% static "img/sinat.svg"%}" width="200" height="50" class="d-inline-block align-center" alt="">      
     </a>
-    
-    </b>
+    <span class="nav-user"> <i class="fas fa-user"></i> {{ user.username }}</span>
     <a href="{% url 'logout' %}" class="btn btn-danger btn-sm"><i class="fas fa-sign-out-alt"></i></a>
 </nav>
 
@@ -82,6 +81,7 @@ let alertShown = false;
                 new Notification("🔔 Nuevo mensaje de: " + data.sender, {
                     body: data.message,
                     icon: "{% static 'img/cat.jpg' %}",
+                    
                 });
             } else if (Notification.permission !== "denied") {
                 Notification.requestPermission().then(function(permission) {
@@ -100,10 +100,7 @@ let alertShown = false;
                 blinkInterval = setInterval(() => {
                     document.title = document.title === "🔔 Nuevo mensaje!" ? originalTitle : "🔔 Nuevo mensaje!";
                    
-                }, 1000);
-                setTimeout(()=>{
-                    alert("Mensaje de " + data.sender);
-                   },500); 
+                }, 1000); 
             }
             
         }

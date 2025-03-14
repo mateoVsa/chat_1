@@ -13,7 +13,12 @@
         {% for message in messages %}
         <div class="message {% if message.sender == request.user %}sent{% else %}received{% endif %}">
             <div class="message-content">
-                <strong>{{ message.sender.username }}</strong>
+                {% comment %} <strong>{{ message.sender.username }}</strong> {% endcomment %}
+                {% if message.image %}
+                <a href="{{ message.image }}" target="_blank">
+                    <img src="{{ message.image }}" class="chat-image" alt="Imagen enviada" style="max-width: 200px; max-height: 200px;">
+                </a>
+            {% endif %}
                 <p>{{ message.message }}</p>
                 <p class="chat-time">{{message.timestamp | date:'H:i'}}</p>
             </div>
@@ -22,9 +27,20 @@
     </div>
 
     <div class="chat-input">
-        <input type="text" id="chat-message-input" class="form-control" placeholder="Escribe un mensaje...">
+        <input type="text" id="chat-message-input" class="form-control" placeholder="Escribe un mensaje | crtl-v para enviar imágenes" autofocus>
+        <div id="image-preview" style="display: none;">
+            <img id="preview-img" src="" alt="Imagen a enviar" style="max-width: 200px; max-height: 200px;">
+            <button id="remove-img" class="btn btn-danger btn-sm">&times;</button>
+        </div>
+        
+        <!-- Input oculto para imágenes -->
+        <input type="file" id="image-input" style="display: none;" accept="image/*">
         <button id="chat-message-submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i></button>
     </div>
+</div>
+<div id="image-modal" class="modal" style="display: none;">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <img class="modal-content" id="modal-img">
 </div>
 
 <script>
@@ -46,6 +62,34 @@
     const chatSocket = new WebSocket(
         wsProchat + "://" + window.location.host + '/ws/chat/' + roomName + '/'
     );  {% endcomment %}
+
+    document.addEventListener("paste", function (event) {
+        const clipboardItems = event.clipboardData.items;
+
+        for (const item of clipboardItems) {
+            if (item.type.startsWith("image/")) {
+                const file = item.getAsFile();
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    document.getElementById("image-preview").style.display = "block";
+                    document.getElementById("preview-img").src = e.target.result;
+                    document.getElementById("preview-img").setAttribute("data-image", e.target.result);
+                };
+                reader.readAsDataURL(file);
+                break;
+            }
+        }
+    });
+
+    // Eliminar imagen antes de enviarla
+    document.getElementById("remove-img").onclick = function () {
+        document.getElementById("image-preview").style.display = "none";
+        document.getElementById("preview-img").src = "";
+    };
+
+
+
 //funcion para las notici
     chatSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
@@ -63,18 +107,37 @@
             // Notificación para mensajes nuevos
         }
         
-        messageDiv.innerHTML = `<div class="message-content">
-                                    <strong>${data.sender}</strong>
-                                    <p>${data.message}</p>
-                                     <p class="chat-time">${timestamp}</p>
-                                </div>`;
+        //{% comment %} messageDiv.innerHTML = `<div class="message-content">
+        //                            {% comment %} <strong>${data.sender}</strong> {% endcomment %}
+        //                            <p>${data.message}</p>
+        //                             <p class="chat-time">${timestamp}</p>
+        //                        </div>`;
+        //------------------------------------------------------------------------//
+        //Visualizar los mensajes en el ChatRoom 
+        if (data.image){
+            messageDiv.innerHTML = `<div class="message-content">
+                <img src="${data.image}" class="chat-image" alt="Imagen enviada">
+                <p>${data.message}</p>
+                <p class="chat-time">${data.timestamp}</p>
+                <div id="image-modal" class="modal" style="display: none;">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <img class="modal-content" id="modal-img">
+</div>
+            </div>
+            `;
+        } else {
+            messageDiv.innerHTML = `<div class="message-content">
+                <p>${data.message}</p>
+                <p class="chat-time">${data.timestamp}</p>
+            </div>`;
+        }
         document.querySelector('#chat-log').appendChild(messageDiv);
 
         scrollToEnd();
     };
 
     chatSocket.onclose = function(e) {
-        console.error('Chat socket closed unexpectedly');
+        console.error('Error: Chat socket cerrado inesperadamente');
     };
 
     document.querySelector('#chat-message-input').onkeyup = function(e) {
@@ -86,24 +149,49 @@
     document.querySelector('#chat-message-submit').onclick = function() {
         const messageInputDom = document.querySelector('#chat-message-input');
         const message = messageInputDom.value.trim();
-
-        if (message !== "") {
+        const imagePreview = document.getElementById("preview-img");
+        let imageSrc = imagePreview.getAttribute("data-image");
+        console.log("Mensaje enviado:", { message, imageSrc });
+        if (message !== "" || imageSrc) {
             chatSocket.send(JSON.stringify({
                 'message': message,
                 'sender': current_user,
                 'receiver': receiver,
+                'image': imageSrc  // Enviar la imagen codificada en Base64
             }));
             messageInputDom.value = '';
+
+            document.getElementById("image-preview").style.display = "none";
+            imagePreview.removeAttribute("data-image");
+            imagePreview.src = "";
         }
         scrollToEnd();
     };
 
     // Desplazar hacia abajo al cargar la página
     scrollToEnd();
+    function openModal(imageSrc) {
+        document.getElementById("modal-img").src = imageSrc;
+        document.getElementById("image-modal").style.display = "block";
+    }
+    
+    function closeModal() {
+        document.getElementById("image-modal").style.display = "none";
+    }
+    
+    // Asigna el evento a las imágenes del chat
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".chat-image").forEach(img => {
+            img.addEventListener("click", function (e) {
+                e.preventDefault();
+                openModal(this.src);
+            });
+        });
+    });
 
     // Solicitar permisos de notificación
     if (Notification.permission !== "granted") {
         Notification.requestPermission();
     }
 </script>
-{% endblock %}
+{% endblock %} 
