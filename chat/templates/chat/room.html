@@ -48,29 +48,72 @@
     const receiver = "{{ receiver }}";
     const current_user = "{{ request.user.username }}";
     const isPrivateChat = {{ is_private_chat|yesno:"true,false" }};
-//funcion para que al ingresar al chat, se vea el ultimo mensaje
+
     function scrollToEnd() {
         const chatLog = document.querySelector('#chat-log');
         chatLog.scrollTop = chatLog.scrollHeight;
     }
-// se crea un WebSocket
-      const chatSocket = new WebSocket(
-        'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
-    );  
 
-     {% comment %} const wsProchat = window.location.protocol === "https:" ? "wss" : "ws";
+    // WebSocket
     const chatSocket = new WebSocket(
-        wsProchat + "://" + window.location.host + '/ws/chat/' + roomName + '/'
-    );  {% endcomment %}
+        'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
+    );
 
+    // Manejar eventos de imágenes en mensajes recibidos por WebSocket
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', data.sender === current_user ? 'sent' : 'received');
+
+        let content = `<div class="message-content">`;
+        if (data.image) {
+            content += `<img src="${data.image}" class="chat-image" alt="Imagen enviada" style="cursor: pointer;">`;
+        }
+        if (data.message) {
+            content += `<p>${data.message}</p>`;
+        }
+        content += `<p class="chat-time">${data.timestamp}</p></div>`;
+        messageDiv.innerHTML = content;
+        
+        document.querySelector('#chat-log').appendChild(messageDiv);
+        scrollToEnd();
+
+        // Agregar evento de clic a la imagen si existe
+        const imgElement = messageDiv.querySelector('.chat-image');
+        if (imgElement) {
+            imgElement.addEventListener('click', function () {
+                openModal(imgElement.src);
+            });
+        }
+    };
+    // Enviar mensajes y/o imágenes
+    document.querySelector('#chat-message-submit').onclick = function() {
+        const messageInput = document.querySelector('#chat-message-input');
+        const imagePreview = document.getElementById("preview-img");
+        const imageSrc = imagePreview.getAttribute("data-image") || null;
+
+        if (messageInput.value.trim() || imageSrc) {
+            chatSocket.send(JSON.stringify({
+                'message': messageInput.value.trim(),
+                'sender': current_user,
+                'receiver': receiver,
+                'image': imageSrc
+            }));
+            messageInput.value = '';
+            document.getElementById("image-preview").style.display = "none";
+            imagePreview.removeAttribute("data-image");
+            imagePreview.src = "";
+        }
+        scrollToEnd();
+    };
+
+    // Evento para pegar imágenes (Ctrl+V)
     document.addEventListener("paste", function (event) {
         const clipboardItems = event.clipboardData.items;
-
         for (const item of clipboardItems) {
             if (item.type.startsWith("image/")) {
                 const file = item.getAsFile();
                 const reader = new FileReader();
-
                 reader.onload = function (e) {
                     document.getElementById("image-preview").style.display = "block";
                     document.getElementById("preview-img").src = e.target.result;
@@ -85,101 +128,21 @@
     // Eliminar imagen antes de enviarla
     document.getElementById("remove-img").onclick = function () {
         document.getElementById("image-preview").style.display = "none";
+        document.getElementById("preview-img").removeAttribute("data-image");
         document.getElementById("preview-img").src = "";
     };
 
-
-
-//funcion para las notici
-    chatSocket.onmessage = function(e) {
-        const data = JSON.parse(e.data);
-
-        const timestamp = data.timestamp;
-        //const formattedTime = timestamp.toLocaleTimeString();
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message');
-
-        if (data.sender === current_user) {
-            messageDiv.classList.add('sent');
-        } else {
-            messageDiv.classList.add('received');
-
-            // Notificación para mensajes nuevos
-        }
-        
-        //{% comment %} messageDiv.innerHTML = `<div class="message-content">
-        //                            {% comment %} <strong>${data.sender}</strong> {% endcomment %}
-        //                            <p>${data.message}</p>
-        //                             <p class="chat-time">${timestamp}</p>
-        //                        </div>`;
-        //------------------------------------------------------------------------//
-        //Visualizar los mensajes en el ChatRoom 
-        if (data.image){
-            messageDiv.innerHTML = `<div class="message-content">
-                <img src="${data.image}" class="chat-image" alt="Imagen enviada">
-                <p>${data.message}</p>
-                <p class="chat-time">${data.timestamp}</p>
-                <div id="image-modal" class="modal" style="display: none;">
-    <span class="close" onclick="closeModal()">&times;</span>
-    <img class="modal-content" id="modal-img">
-</div>
-            </div>
-            `;
-        } else {
-            messageDiv.innerHTML = `<div class="message-content">
-                <p>${data.message}</p>
-                <p class="chat-time">${data.timestamp}</p>
-            </div>`;
-        }
-        document.querySelector('#chat-log').appendChild(messageDiv);
-
-        scrollToEnd();
-    };
-
-    chatSocket.onclose = function(e) {
-        console.error('Error: Chat socket cerrado inesperadamente');
-    };
-
-    document.querySelector('#chat-message-input').onkeyup = function(e) {
-        if (e.keyCode === 13) {
-            document.querySelector('#chat-message-submit').click();
-        }
-    };
-
-    document.querySelector('#chat-message-submit').onclick = function() {
-        const messageInputDom = document.querySelector('#chat-message-input');
-        const message = messageInputDom.value.trim();
-        const imagePreview = document.getElementById("preview-img");
-        let imageSrc = imagePreview.getAttribute("data-image");
-        console.log("Mensaje enviado:", { message, imageSrc });
-        if (message !== "" || imageSrc) {
-            chatSocket.send(JSON.stringify({
-                'message': message,
-                'sender': current_user,
-                'receiver': receiver,
-                'image': imageSrc  // Enviar la imagen codificada en Base64
-            }));
-            messageInputDom.value = '';
-
-            document.getElementById("image-preview").style.display = "none";
-            imagePreview.removeAttribute("data-image");
-            imagePreview.src = "";
-        }
-        scrollToEnd();
-    };
-
-    // Desplazar hacia abajo al cargar la página
-    scrollToEnd();
+    // Modal de imágenes
     function openModal(imageSrc) {
         document.getElementById("modal-img").src = imageSrc;
         document.getElementById("image-modal").style.display = "block";
     }
-    
+
     function closeModal() {
         document.getElementById("image-modal").style.display = "none";
     }
-    
-    // Asigna el evento a las imágenes del chat
+
+    // Asignar evento a imágenes cargadas al abrir el chat
     document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll(".chat-image").forEach(img => {
             img.addEventListener("click", function (e) {
@@ -189,9 +152,7 @@
         });
     });
 
-    // Solicitar permisos de notificación
-    if (Notification.permission !== "granted") {
-        Notification.requestPermission();
-    }
+    // Desplazar al último mensaje
+    scrollToEnd();
 </script>
 {% endblock %} 

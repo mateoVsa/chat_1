@@ -19,8 +19,9 @@ h1 {
   color: #ffffff;
 }
 h4{
-  color: #ffffff;
+  color: #1b1c3b;
   padding: 20px;
+  text-align: center;
 }
 .chat-sidebar {
   background: #868c9267;
@@ -39,16 +40,15 @@ h4{
   scrollbar-width: thin;
   background-color: #1b1c3b87 !important;
 
-  
 }
 .list-group-item{
-  background-color: #1b1c3b57 !important;
+  background-color: #1b1c3b !important;
   border-bottom: 1px solid #70809026;
   max-height: 70px;
 }
 .list-group-item:hover{
-  background-color: #1b1c3b !important;
-  border-color: #1b1c3b !important;
+  background-color: #70809026 !important;
+  border-color: #70809026 !important;
 }
 .sidebar-header {
   display: flex;
@@ -102,9 +102,14 @@ h4{
 
 }
 .chat-init{
-  color: #fcfcfc !important;
-  padding: 30px;
-  background-color: #3f506336 !important;
+  color: #1b1c3b !important;
+  background-color: #d7dee5 !important;
+  border: 0;
+  text-align: center;
+}
+
+.chat-ini{
+  padding: 100px;
 }
 /* Encabezado del chat */
 .chat-header {
@@ -155,7 +160,7 @@ h4{
   box-shadow: 2px 2px 8px 4px  rgba(0, 0, 0, 0.1);
 }
 .col-md-8{
-  background-color: #031e3b !important;
+  background-color: #d7dee5 !important;
   margin-bottom: 0;
   padding: 0;
 }
@@ -205,6 +210,7 @@ h4{
   background-color: #0e0f22  !important;
   border-color: #0e0f22  !important;
   color: #20a006;
+
 }
 
 .chat-time{
@@ -243,7 +249,7 @@ border-color: #74b570 !important;
   align-self: flex-start;
 }
 .modal {
-  display: none;
+  display: flex ;
   position: fixed;
   z-index: 1000;
   left: 0;
@@ -254,10 +260,12 @@ border-color: #74b570 !important;
   justify-content: center;
   align-items: center;
   padding: 10px;
+  
+
 }
 
 .modal-content-container {
-  display: flex;
+  display: flex !important;
   justify-content: center;
   align-items: center;
   max-width: 90vw;
@@ -266,8 +274,8 @@ border-color: #74b570 !important;
 }
 
 .modal-content {
-  max-width: 100%;
-  max-height: 100%;
+  max-width: 95%;
+  max-height: 95%;
   width: auto;
   height: auto;
 }

@@ -4,14 +4,16 @@
 {% block title %}Lista de Chats{% endblock %}
 
 {% block content %}
-    <h4>  Chat de soporte SINAT</h4>
+<div class="chat-ini">
+   <b> <h4>  Chat de soporte SINAT</h4></b>
     <ul class="list-group">
         {% for room in chat_rooms %}
-            <li class="list-group-item">
+            <li >
                 <a class="chat-init" href="#">Empieza a chatear.</a>
             </li>
         {% empty %} 
-            <li class="list-group-item chat-init">Empieza a chatear</li>
+            <li class="chat-init">Empieza a chatear</li>
         {% endfor %}
     </ul>
+</div>
 {% endblock %}

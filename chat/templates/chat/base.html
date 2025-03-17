@@ -20,7 +20,7 @@
     <a class="navbar-brand" href="{% url 'index' %}">
 <img src="{% static "img/sinat.svg"%}" width="200" height="50" class="d-inline-block align-center" alt="">      
     </a>
-    <span class="nav-user"> <i class="fas fa-user"></i> {{ user.username }}</span>
+    <span class="nav-user"> <i class="fas fa-user"></i> <b>{{ user.username }}</b></span>
     <a href="{% url 'logout' %}" class="btn btn-danger btn-sm"><i class="fas fa-sign-out-alt"></i></a>
 </nav>
 
@@ -56,18 +56,20 @@
     <source src="{% static "audio/notification.mp3" %}">
 </audio>
 <script>
+    const roomNameN = "{{ room_name }}";
+    const receiverN = "{{ receiver }}";
     const notificationSound = new Audio("{% static 'audio/notification.mp3' %}"); // Sonido de alerta
 let originalTitle = document.title; // Guarda el título original
 let blinkInterval;
 let alertShown = false;
 
-      const notificationSocket = new WebSocket(
+      {% comment %} const notificationSocket = new WebSocket(
         'ws://' + window.location.host + '/ws/notifications/'
-    );  
-     {% comment %} const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
+    );   {% endcomment %}
+      const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
     const notificationSocket = new WebSocket(
         wsProtocol + "://" + window.location.host + "/ws/notifications/"
-    ); {% endcomment %}
+    ); 
  {% comment %} const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
     const notificationSocket = new WebSocket(
         wsProtocol + "://" + window.location.host + "/ws/notifications/"
@@ -76,13 +78,16 @@ let alertShown = false;
         const data = JSON.parse(e.data);
     
         if (data.type === 'send_notification' && data.receiver === "{{ request.user.username }}") {
-            
+           
             if (Notification.permission === "granted") {
-                new Notification("🔔 Nuevo mensaje de: " + data.sender, {
+              var notification =  new Notification("🔔 Nuevo mensaje de: " + data.sender, {
                     body: data.message,
                     icon: "{% static 'img/cat.jpg' %}",
                     
                 });
+            notification.onclick = function(){
+                window.location.href= '/chat/' + roomNameN + '/' + receiverN;
+            }
             } else if (Notification.permission !== "denied") {
                 Notification.requestPermission().then(function(permission) {
                     if (permission === "granted") {
@@ -91,9 +96,12 @@ let alertShown = false;
                             icon: "{% static 'img/cat.jpg' %}"
                         });
                     }
+                    
                 });
+                
+               
             }
-    
+            
             notificationSound.play();
     
             if (document.hidden) {

@@ -146,5 +146,5 @@ CHANNEL_LAYERS = {
 }
 
 LOGOUT_REDIRECT_URL = 'login'
-
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+DATA_UPLOAD_MAX_MEMORY_SIZE = 2242880
