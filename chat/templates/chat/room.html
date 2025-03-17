@@ -55,9 +55,13 @@
     }
 
     // WebSocket
-    const chatSocket = new WebSocket(
+    {% comment %} const chatSocket = new WebSocket(
         'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
-    );
+    ); {% endcomment %}
+    const wsProchat = window.location.protocol === "https:" ? "wss" : "ws";
+     const chatSocket = new WebSocket(
+         wsProchat + "://" + window.location.host + '/ws/chat/' + roomName + '/'
+     );
 
     // Manejar eventos de imágenes en mensajes recibidos por WebSocket
     chatSocket.onmessage = function(e) {
