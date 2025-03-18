@@ -29,5 +29,6 @@ urlpatterns = [
     path('logout/', views.custom_logout, name='logout'),
     path('login/',views.custom_login, name = 'login'),
     path('', RedirectView.as_view(url='/login/')),
-]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] 
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
  
