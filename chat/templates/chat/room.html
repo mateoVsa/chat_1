@@ -27,7 +27,7 @@
     </div>
 
     <div class="chat-input">
-        <input type="text" id="chat-message-input" class="form-control" placeholder="Escribe un mensaje | crtl-v para enviar imágenes" autofocus>
+        <input type="text" id="chat-message-input" class="form-control" placeholder="Escribe un mensaje | Ctrl-v para enviar imágenes" autofocus>
         <div id="image-preview" style="display: none;">
             <img id="preview-img" src="" alt="Imagen a enviar" style="max-width: 200px; max-height: 200px;">
             <button id="remove-img" class="btn btn-danger btn-sm">&times;</button>
@@ -38,6 +38,7 @@
         <button id="chat-message-submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i></button>
     </div>
 </div>
+<!--Modal para visualizar imágenes-->
 <div id="image-modal" class="modal" style="display: none;">
     <span class="close" onclick="closeModal()">&times;</span>
     <img class="modal-content" id="modal-img">
@@ -55,10 +56,10 @@
     }
 
     // WebSocket
-    {% comment %} const chatSocket = new WebSocket(
+     {% comment %} const chatSocket = new WebSocket(
         'ws://' + window.location.host + '/ws/chat/' + roomName + '/'
-    ); {% endcomment %}
-    const wsProchat = window.location.protocol === "https:" ? "wss" : "ws";
+    );  {% endcomment %}
+     const wsProchat = window.location.protocol === "https:" ? "wss" : "ws";
      const chatSocket = new WebSocket(
          wsProchat + "://" + window.location.host + '/ws/chat/' + roomName + '/'
      );
@@ -139,7 +140,7 @@
     // Modal de imágenes
     function openModal(imageSrc) {
         document.getElementById("modal-img").src = imageSrc;
-        document.getElementById("image-modal").style.display = "block";
+        document.getElementById("image-modal").style.display = "flex";
     }
 
     function closeModal() {
@@ -155,7 +156,12 @@
             });
         });
     });
-
+    document.getElementById("chat-message-input").addEventListener("keypress",function(e){
+        if(e.key ==="Enter" && !event.shiftKey){
+            e.preventDefault();
+            document.getElementById("chat-message-submit").click();
+        }
+    });
     // Desplazar al último mensaje
     scrollToEnd();
 </script>

@@ -5,14 +5,16 @@
 
 {% block content %}
 <div class="chat-ini">
-   <b> <h4>  Chat de soporte SINAT</h4></b>
+    <h4>  Chat de soporte SINAT</h4>
     <ul class="list-group">
         {% for room in chat_rooms %}
             <li >
                 <a class="chat-init" href="#">Empieza a chatear.</a>
             </li>
         {% empty %} 
-            <li class="chat-init">Empieza a chatear</li>
+            <li class="chat-init">Empieza a chatear en tiempo real.<br> Para hacer capturas de pantalla usa el atajo <b>Win + shift + S</b> y
+                <b>Ctrl-V </b>para subir la imagen y enviarla por el chat.
+            </li>
         {% endfor %}
     </ul>
 </div>

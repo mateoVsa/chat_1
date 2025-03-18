@@ -63,9 +63,9 @@ let originalTitle = document.title; // Guarda el título original
 let blinkInterval;
 let alertShown = false;
 
-      {% comment %} const notificationSocket = new WebSocket(
+       {% comment %} const notificationSocket = new WebSocket(
         'ws://' + window.location.host + '/ws/notifications/'
-    );   {% endcomment %}
+    );    {% endcomment %}
       const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
     const notificationSocket = new WebSocket(
         wsProtocol + "://" + window.location.host + "/ws/notifications/"
@@ -86,7 +86,12 @@ let alertShown = false;
                     
                 });
             notification.onclick = function(){
-                window.location.href= '/chat/' + roomNameN + '/' + receiverN;
+                if(roomNameN && receiverN){
+                   window.location.href= '/chat/' + roomNameN + '/' + receiverN; 
+                }else{
+                    window.location.href= '/chat/';
+                }
+                
             }
             } else if (Notification.permission !== "denied") {
                 Notification.requestPermission().then(function(permission) {

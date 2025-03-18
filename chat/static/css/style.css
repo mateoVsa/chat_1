@@ -22,6 +22,7 @@ h4{
   color: #1b1c3b;
   padding: 20px;
   text-align: center;
+  font-weight: bold;
 }
 .chat-sidebar {
   background: #868c9267;
@@ -39,7 +40,16 @@ h4{
   overflow-x: hidden;
   scrollbar-width: thin;
   background-color: #1b1c3b87 !important;
+  scrollbar-color: #d7dee5 #1b1c3b;
 
+}
+.list-group::-webkit-scrollbar-thumb {
+  background-color: #1b1c3b;    /* color of the scroll thumb */
+  border-radius: 20px;       /* roundness of the scroll thumb */
+  border: 3px solid #d7dee5;  /* creates padding around scroll thumb */
+}
+body::-webkit-scrollbar-track {
+  background: #d7dee5;        /* color of the tracking area */
 }
 .list-group-item{
   background-color: #1b1c3b !important;
@@ -82,7 +92,7 @@ h4{
 /* Estilo del input */
 .chat-input {
   display: flex;
-  background-color: #0e0f22 !important;
+  background-color: #d7dee5  !important;
 }
 
 .chat-input input {
@@ -113,8 +123,8 @@ h4{
 }
 /* Encabezado del chat */
 .chat-header {
-  background: #1b1c3b;
-  color: white;
+  background: #d7dee5;
+  color: #1b1c3b;
   padding: 10px;
   text-align: initial;
   font-size: 18px;
@@ -145,7 +155,7 @@ h4{
 /* Estilo de mensaje recibido */
 .message.received {
   align-self: flex-start;
-  background-color: #eeeeee;
+  background-color: #d7dee5;
   padding: 10px;
   border-radius: 15px 15px 15px 0;
   box-shadow: 2px 2px 8px 4px  rgba(0, 0, 0, 0.1);
@@ -207,10 +217,13 @@ h4{
 }
 
 .btn-primary{
-  background-color: #0e0f22  !important;
-  border-color: #0e0f22  !important;
+  background-color: #d7dee5   !important;
+  border-color: #d7dee5   !important;
   color: #20a006;
 
+}
+.btn-primary:hover{
+  color: #1b1c3b !important;
 }
 
 .chat-time{
@@ -278,6 +291,7 @@ border-color: #74b570 !important;
   max-height: 95%;
   width: auto;
   height: auto;
+  object-fit: contain;
 }
 
 .close {
