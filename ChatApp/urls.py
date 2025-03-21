@@ -29,6 +29,7 @@ urlpatterns = [
     path('logout/', views.custom_logout, name='logout'),
     path('login/',views.custom_login, name = 'login'),
     path('', RedirectView.as_view(url='/login/')),
+    path('unread_messages_count/', views.unread_messages_count, name='unread_messages_count'),
 ] 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
  

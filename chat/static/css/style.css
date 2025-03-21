@@ -27,10 +27,8 @@ h4{
 .chat-sidebar {
   background: #868c9267;
   height: 100vh;
-  /* padding: 15px; */
   padding-left: 0;
   padding-right: 0;
-  /* border-right: 5px solid #031e3b; */
   height: 665px;
   
 }
@@ -43,9 +41,10 @@ h4{
   scrollbar-color: #d7dee5 #1b1c3b;
 
 }
+/*Color scrollbar para diferentes navegadores */
 .list-group::-webkit-scrollbar-thumb {
-  background-color: #1b1c3b;    /* color of the scroll thumb */
-  border-radius: 20px;       /* roundness of the scroll thumb */
+  background-color: #1b1c3b;   
+  border-radius: 20px;       
   border: 3px solid #d7dee5;  /* creates padding around scroll thumb */
 }
 body::-webkit-scrollbar-track {
@@ -103,9 +102,6 @@ body::-webkit-scrollbar-track {
   display: flex;
   flex-direction: column;
   height: 85vh;
-  /*max-width: 900px;*/
-  /* margin: 20px auto; */
-  /* border: 1px solid #ccc; */
   border-radius: 0;
   margin-left: 0;
   background: #f8f9fa;
@@ -115,11 +111,11 @@ body::-webkit-scrollbar-track {
   color: #1b1c3b !important;
   background-color: #d7dee5 !important;
   border: 0;
-  text-align: center;
+  text-align: start;
 }
 
 .chat-ini{
-  padding: 100px;
+  padding: 150px;
 }
 /* Encabezado del chat */
 .chat-header {
@@ -307,4 +303,8 @@ border-color: #74b570 !important;
   padding-left: 66%;
   font-size: large;
   color: #1b1c3b;
+}
+.badge{
+background-color: red !important;
+color: #d7dee5;
 }

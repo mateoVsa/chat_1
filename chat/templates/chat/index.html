@@ -5,16 +5,29 @@
 
 {% block content %}
 <div class="chat-ini">
-    <h4>  Chat de soporte SINAT</h4>
+    <h4>  Empieza a chatear en tiempo real
+    </h4>
     <ul class="list-group">
         {% for room in chat_rooms %}
             <li >
                 <a class="chat-init" href="#">Empieza a chatear.</a>
             </li>
         {% empty %} 
-            <li class="chat-init">Empieza a chatear en tiempo real.<br> Para hacer capturas de pantalla usa el atajo <b>Win + shift + S</b> y
-                <b>Ctrl-V </b>para subir la imagen y enviarla por el chat.
+        
+            <li class="chat-init">Para compartir capturas de pantalla en el chat, sigue estos pasos:
+                <br> <ol> 
+                <li class="chat-init"><b>Toma captura de pantalla:</b></li>
+                <p>Presiona <u>Windows + Shift + S</u> para seleccionar y copiar una parte de la pantalla.
+                </p>
+                <li class="chat-init"><b>Pega la imagen en el chat:</b>
+                </li>
+                <p>Usa <u>Ctrl + V</u> en el campo de texto del chat para subir la imagen automáticamente.
+                </p>
+                <li class="chat-init"><b>Envía la imagen:</b></li>
+                <p>Presiona Enter para compartirla con tu contacto en tiempo real.
+                </p>
             </li>
+        </ol>
         {% endfor %}
     </ul>
 </div>

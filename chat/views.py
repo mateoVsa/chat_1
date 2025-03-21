@@ -3,10 +3,10 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.contrib import messages
 from .models import ChatRoom, Message
-from .forms import ChatRoomForm
+from django.http import JsonResponse
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 # Verificar si el usuario es administrador o staff
@@ -68,7 +68,8 @@ def room(request, room_name, receiver):
     else:
         messages_list = Message.objects.filter(receiver__username=room_name).order_by('timestamp')
 
-    
+    Message.objects.filter(sender__username=room_name, receiver=request.user, is_read=False).update(is_read=True)
+
     send_notification(sender=request.user.username, receiver=room_name , message = "")
     
     return render(request, 'chat/room.html', {
@@ -135,20 +136,8 @@ def custom_login(request):
             messages.error(request, "Credenciales incorrectas. Intente de nuevo.")
 
     return render(request, 'registration/login.html')
-# from django.db.models import Max
-# def chat_list(request):
-#     last_message = (
-#         Message.objects.filter(receiver = request.user)
-#         .values('sender')
-#         .annotate(last_message = Max('timestamp'))
-#         .order_by('-last_message')
-#     )
-    
-#     last_message_dict = {
-#         msg['sender']: Message.objects.filter(sender__id=msg['sender'],receiver=request.user)
-#         .order_by('-timestamp')
-#         .first()
-#         for msg in last_message
-#     }
-#     user= User.objects.filter(id__in=last_message_dict.keys())
-#     return render (request, 'chat/base.html',{'user':user,'last_message':last_message_dict}) lista de mensajes recientes
+@login_required
+def unread_messages_count(request):
+    unread_counts = Message.objects.filter( receiver = request.user, is_read=False).values('sender__username').annotate(count = Count('id'))
+    unread_data = {item['sender__username']:item['count'] for item in unread_counts}
+    return JsonResponse({'unread_counts': unread_data})

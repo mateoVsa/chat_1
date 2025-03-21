@@ -1,0 +1,5 @@
+./media
+./media/chat_images
+media/*
+./db.sqlite3/
+./backup.json
