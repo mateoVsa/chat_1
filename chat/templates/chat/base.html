@@ -1,4 +1,3 @@
-
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
@@ -16,9 +15,8 @@
 
 <!-- Barra de navegación -->
 <nav class="navbar navbar-light bg-light">
-    
     <a class="navbar-brand" href="{% url 'index' %}">
-<img src="{% static "img/sinat.svg"%}" width="200" height="50" class="d-inline-block align-center" alt="">      
+        <img src="{% static 'img/sinat.svg' %}" width="200" height="50" class="d-inline-block align-center" alt="">      
     </a>
     <span class="nav-user"> <i class="fas fa-user"></i> <b>{{ user.username }}</b></span>
     <a href="{% url 'logout' %}" class="btn btn-danger btn-sm"><i class="fas fa-sign-out-alt"></i></a>
@@ -26,18 +24,16 @@
 
 <div class="container-fluid">
     <div class="row">
-        
         <!-- Sidebar con la lista de usuarios -->
         <div class="col-md-4 chat-sidebar">
             <div class="chat-header-2">
-            <h5>Chats</h5>
+                <h5>Chats</h5>
             </div>
             <ul class="list-group">
                 {% for user in users %}
                 <li class="list-group-item {% if user.username == active_user %}active-user{% endif %} d-flex justify-content-between align-items-center">
                     <a class="btn" href="{% url 'room' user.username user.username %}">{{ user.username }}</a>
-                    <span id="unread-badge-{{user.username}}" class="badge badge-primary badge-pill" style="display: none">0</span>
-                    
+                    <span id="unread-badge-{{ user.username }}" class="badge badge-primary badge-pill" style="display: none">0</span>
                 </li>
                 {% empty %}
                 <li class="list-group-item">No hay usuarios disponibles.</li>
@@ -53,52 +49,37 @@
 </div>
 
 <!-- Scripts de Bootstrap -->
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <audio id="notificationSound">
-    <source src="{% static "audio/notification.mp3" %}">
+    <source src="{% static 'audio/notification.mp3' %}">
 </audio>
+
 <script>
     const notificationSound = new Audio("{% static 'audio/notification.mp3' %}"); // Sonido de alerta
-let originalTitle = document.title; // Guarda el título original
-let blinkInterval;
-let alertShown = false;
+    let originalTitle = document.title;
+    let blinkInterval;
 
-        const notificationSocket = new WebSocket(
-        'ws://' + window.location.host + '/ws/notifications/'
-    );    
-    //WebSocket con ssl "https"
-      {% comment %} const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
+    const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
     const notificationSocket = new WebSocket(
         wsProtocol + "://" + window.location.host + "/ws/notifications/"
-    );  {% endcomment %}
- {% comment %} const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
-    const notificationSocket = new WebSocket(
-        wsProtocol + "://" + window.location.host + "/ws/notifications/"
-    ); {% endcomment %}
+    );
+
     notificationSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
-    
-        if (data.type === 'send_notification' && data.receiver === "{{ request.user.username }}") {
-           
+
+        if (data.type === 'send_notification' && data.receiver === "{{ request.user.username|escapejs }}") {
+            // Mostrar notificación en el navegador
             if (Notification.permission === "granted") {
-              var notification =  new Notification("🔔 Nuevo mensaje de: " + data.sender, {
+                var notification = new Notification("🔔 Nuevo mensaje de: " + data.sender, {
                     body: data.message,
                     icon: "{% static 'img/cat.jpg' %}",
-                    
                 });
-            notification.onclick = function(){
-                if(Notification.permission ==="granted"){
-                   window.location.href= '/chat/' + data.sender + '/' + data.sender; 
-                }else if(window.location.href = '/chat/'){
-                    window.location.href= '/chat/' + data.sender + '/' + data.sender;
-                }else{
-                    window.location.href= '/chat/';
-                }
-                
-            }
+
+                notification.onclick = function() {
+                    window.location.href = '/chat/' + data.sender + '/' + data.sender;
+                };
             } else if (Notification.permission !== "denied") {
                 Notification.requestPermission().then(function(permission) {
                     if (permission === "granted") {
@@ -107,25 +88,30 @@ let alertShown = false;
                             icon: "{% static 'img/cat.jpg' %}"
                         });
                     }
-                    
                 });
-                
-               
             }
-            
+
+            // Reproducir sonido de notificación
             notificationSound.play();
-    
+
+            // Actualizar contador de mensajes no leídos
+            let badge = document.getElementById(`unread-badge-${data.sender}`);
+            if (badge) {
+                let count = parseInt(badge.textContent) || 0;
+                count += 1;
+                badge.textContent = count;
+                badge.style.display = 'inline';
+            }
+
+            // Parpadeo del título si la pestaña está inactiva
             if (document.hidden) {
                 blinkInterval = setInterval(() => {
                     document.title = document.title === "🔔 Nuevo mensaje!" ? originalTitle : "🔔 Nuevo mensaje!";
-                   
-                }, 1000); 
+                }, 1000);
             }
-            
         }
-        
     };
-    
+
     // Restaurar título cuando el usuario regrese a la pestaña
     document.addEventListener("visibilitychange", () => {
         if (!document.hidden) {
@@ -133,32 +119,11 @@ let alertShown = false;
             document.title = originalTitle;
         }
     });
-    
+
     // Solicitar permisos de notificación al cargar la página
     if (Notification.permission !== "granted") {
         Notification.requestPermission();
     }
-    function updateUnreadCounts() {
-        fetch("{% url 'unread_messages_count' %}")
-        .then(response => response.json())
-        .then(data => {
-            document.querySelectorAll('.list-group-item').forEach(item => {
-                const username = item.querySelector('a').textContent.trim();
-                const badge = item.querySelector('.badge');
-
-                if (data.unread_counts[username]) {
-                    badge.textContent = data.unread_counts[username];
-                    badge.style.display = 'inline';
-                } else {
-                    badge.style.display = 'none';
-                }
-            });
-        });
-    }
-
-    setInterval(updateUnreadCounts, 5000); // Actualiza cada 5s
-    document.addEventListener("DOMContentLoaded", updateUnreadCounts);
-    
 </script>
 
 </body>
